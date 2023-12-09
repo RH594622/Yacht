@@ -471,8 +471,8 @@ int choiceToInt(char str[20])
     case 'L':case 'l': return 10;                       //LitlteStraight
     case 'B':case 'b': return 11;                       //BigStraight
     case 'C':case 'c': return 12;                       //Choice
-    case 'Y':case 'y': return 13;                       //Twos
-    case 'T':case 't': return (str[1] == 'w') ? 2 : 3;  //Threes
+    case 'Y':case 'y': return 13;                       //Yacht
+    case 'T':case 't': return (str[1] == 'w') ? 2 : 3;  //Twos & Threes
     case 'F':case 'f':                                  //
         if (str[1] == 'i')                              //Five
             return 5;                                   //
@@ -581,7 +581,7 @@ void choseScore(int dice[], Player *p,int turn)
     gotoxy(3, 12);
     scanf_s(" %19[^\n]", choiceStr,19);
     choice = choiceToInt(choiceStr);
-    if (choice > 0 && choice < 13 && !p[0].scoreRisistered[choice - 1])
+    if (choice > 0 && choice < 14 && !p[0].scoreRisistered[choice - 1])
     {
         p[0].score[choice - 1] *= -1;
         p[0].scoreRisistered[choice - 1] = true;
