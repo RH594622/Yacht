@@ -287,32 +287,6 @@ void renderDice(int dice[])
     return;
 
 }
-void reRollDice(int* dice, int count)
-{
-    if (count == 2)
-        return;
-    int changed = 0;
-    char input[20] = "";
-
-    writeconsole("다시 돌릴 주사위를 입력해주세요.");
-    printScreen();
-    gotoxy(3, 12);
-    scanf_s(" %19[^\n]", input, 20);
-    for (int i = 0; i < 20; i++)
-    {
-        switch (input[i])
-        {
-        case '1':case '2':case '3':case '4':case '5':
-            dice[input[i] - '0' - 1] = rand() % 6 + 1; changed++;
-        default:break;
-        }
-    }
-    sort(dice, 5);
-    renderDice(dice);
-    if (changed != 0)
-        reRollDice(dice, count + 1);
-    return;
-}
 
 int scoreAces(int dice[]) {
     int score = 0;
@@ -511,6 +485,19 @@ int choiceToInt(char str[20])
     }
 }
 
+void resetscore(Player *p,int turn)
+{
+        int x, y;
+    for (int i = 0; i < 13; i++)
+        if (!p[0].scoreRisistered[i])
+        {
+            x = (i < 7) ? 20 + turn * 10 : 79 + turn * 10;
+            y = (i < 7) ? 3 + i : -4 + i;
+            p[0].score[i] = 0;
+            removeTextOnScreen(x, y, 9);
+        }
+    return;
+}
 void scoreF(int dice[5], Player* p)
 {
         p[0].score[0] = checkinvert(scoreAces(dice), p[0].scoreRisistered[0]);
@@ -532,20 +519,37 @@ void scoreF(int dice[5], Player* p)
         p[0].score[13] = scoreTotal(p[0]);
     return;
 }
-void resetscore(Player *p,int turn)
+
+
+void reRollDice(int* dice, int count,Player p,int turn)
 {
-        int x, y;
-    for (int i = 0; i < 13; i++)
-        if (!p[0].scoreRisistered[i])
+    if (count == 2)
+        return;
+    int changed = 0;
+    char input[20] = "";
+
+    writeconsole("다시 돌릴 주사위를 입력해주세요.");
+    printScreen();
+    gotoxy(3, 12);
+    scanf_s(" %19[^\n]", input, 20);
+    for (int i = 0; i < 20; i++)
+    {
+        switch (input[i])
         {
-            x = (i < 7) ? 20 + turn * 10 : 79 + turn * 10;
-            y = (i < 7) ? 3 + i : -4 + i;
-            p[0].score[i] = 0;
-            removeTextOnScreen(x, y, 9);
+        case '1':case '2':case '3':case '4':case '5':
+            dice[input[i] - '0' - 1] = rand() % 6 + 1; changed++;
+        default:break;
         }
+    }
+    sort(dice, 5);
+    renderDice(dice);
+    scoreF(dice, &p);
+    scoreToScreen(p, turn, false);
+    if (changed != 0)
+        reRollDice(dice, count + 1, p, turn);
     return;
 }
-void gchoice(int dice[], Player p)
+void gchoice(int dice[], Player p,int turn)
 {
 
     writeconsole("다시돌리려면 Y 아니면 N를 입력해주세요.");
@@ -554,7 +558,7 @@ void gchoice(int dice[], Player p)
     gotoxy(3, 12);
     scanf_s(" %c", &choice);
     if (choice == 'Y')
-        reRollDice(dice, 0);
+        reRollDice(dice, 0, p,turn);
     else if (choice == 'N')
         return;
     else
@@ -562,7 +566,7 @@ void gchoice(int dice[], Player p)
         writeconsole("잘못된 입력입니다.");
         printScreen();
         getchar();
-        gchoice(dice, p);
+        gchoice(dice, p, turn);
     }
     return;
 }
@@ -638,12 +642,13 @@ void yacht()
             scoreF(dice, &p[turn]);
 
             scoreToScreen(p[turn], turn, false);
-            gchoice(dice, p[turn]);
+            gchoice(dice, p[turn],turn);
             choseScore(dice, &p[turn], turn);
             resetscore(&p[turn],turn);
             scoreToScreen(p[turn], turn, true);
         }
     }
+
 
     //gametest(p);
     gameend(p);
